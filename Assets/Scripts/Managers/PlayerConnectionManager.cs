@@ -35,7 +35,10 @@ public class PlayerConnectionManager : NetworkBehaviour
 
     private void OnDisable()
     {
-        _playerNetworkData.OnListChanged -= OnPlayerDataListChanged;
+        if (!IsServer)
+        {
+            _playerNetworkData.OnListChanged -= OnPlayerDataListChanged;
+        }
     }
 
     private void OnPlayerDataListChanged(NetworkListEvent<PlayerData> changeEvent)
@@ -102,7 +105,7 @@ public class PlayerConnectionManager : NetworkBehaviour
         _playerNetworkData.Add(data);
     }
 
-    public void DisconnectServer ()
+    public void DisconnectServer()
     {
         if (_playerNetworkData.Contains(GetPlayerData()))
         {
@@ -115,15 +118,16 @@ public class PlayerConnectionManager : NetworkBehaviour
     private void Server_OnClientDisconnectCallback(ulong clientId)
     {
         if(_isServerDataRemoved) return;
-        
-        for (int i = 0; i < _playerNetworkData.Count; i++)
-        {
-            var playerData = _playerNetworkData[i];
 
-            if (playerData.clientId.Equals(clientId))
-            {
-                _playerNetworkData.RemoveAt(i);
-            }
+        if (IsServer)
+        {
+            _playerNetworkData.OnListChanged -= OnPlayerDataListChanged;
+
+            _playerNetworkData = null;
+        }
+        else
+        {
+            DisconnectServer();
         }
     }
 

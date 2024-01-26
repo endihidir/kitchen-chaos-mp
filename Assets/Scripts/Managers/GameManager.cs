@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using Unity.Netcode;
@@ -25,8 +26,8 @@ public class GameManager : NetworkBehaviour
     private Dictionary<ulong, bool> _playerReadyDictionary = new Dictionary<ulong, bool>();
     private Dictionary<ulong, bool> _playerPauseDictionary = new Dictionary<ulong, bool>();
     public GamePlayState CurrentGameplayState => _currentGameplayState.Value;
-
     public bool IsWaitingToStart => _currentGameplayState.Value == GamePlayState.WaitingToStart;
+    
     private void Awake()
     {
         Instance = this;
@@ -120,6 +121,8 @@ public class GameManager : NetworkBehaviour
     private void SetPlayerReadyServerRpc(ServerRpcParams serverRpcParams = default)
     {
         _playerReadyDictionary[serverRpcParams.Receive.SenderClientId] = true;
+        
+        PlayerReadyForPlayClientRpc(serverRpcParams.Receive.SenderClientId);
 
         var allClientsReady = true;
         
@@ -136,6 +139,19 @@ public class GameManager : NetworkBehaviour
        {
            _currentGameplayState.Value = GamePlayState.CountdownToStart;
        }
+    }
+
+    [ClientRpc]
+    private void PlayerReadyForPlayClientRpc(ulong senderClientId)
+    {
+        var playerConnectionManager = PlayerConnectionManager.Instance;
+
+        var isPlayerContains = playerConnectionManager.GetPlayerData().clientId.Equals(senderClientId);
+
+        if (isPlayerContains)
+        {
+            GameEvents.OnPlayerReadyToPlay?.Invoke();
+        }
     }
 
     private void OnStartUpdate()
@@ -195,7 +211,7 @@ public class GameManager : NetworkBehaviour
 
     private async void UpdateAsync()
     {
-        _cancellationTokenSource = new CancellationTokenSource();
+        _cancellationTokenSource ??= new CancellationTokenSource();
         
         while (_cancellationTokenSource is not null)
         {

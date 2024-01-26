@@ -16,12 +16,19 @@ public class WaitingForOtherPlayersUI : MonoBehaviour
     {
         GameEvents.OnGameStateChanged += OnGameStateChanged;
         GameEvents.OnMultiplayerGamePaused += OnLocalGamePaused;
+        GameEvents.OnPlayerReadyToPlay += OnPlayerReadyToPlay;
     }
     
     private void OnDisable()
     {
         GameEvents.OnGameStateChanged -= OnGameStateChanged;
         GameEvents.OnMultiplayerGamePaused -= OnLocalGamePaused;
+        GameEvents.OnPlayerReadyToPlay -= OnPlayerReadyToPlay;
+    }
+
+    private void OnPlayerReadyToPlay()
+    {
+        _waitForOtherPlayersTxt.text = "WAITING FOR OTHER PLAYERS...";
     }
 
     private void OnLocalGamePaused(bool isLocalGamePaused)

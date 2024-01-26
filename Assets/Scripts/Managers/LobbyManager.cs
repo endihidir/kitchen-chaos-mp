@@ -15,8 +15,6 @@ public class LobbyManager : NetworkBehaviour
 {
     public static LobbyManager Instance { get; private set; }
 
-    [SerializeField] private GameObject _fadePanel;
-
     private Lobby _joinedLobby;
     public Lobby Lobby => _joinedLobby;
 
@@ -40,6 +38,8 @@ public class LobbyManager : NetworkBehaviour
     {
         _updateCancellationToken = new CancellationTokenSource();
         
+        GameEvents.OnEnableLobbyFadePanel?.Invoke(!playMultiplayer);
+        
         HandleHeartbeatAsync();
         
         RefreshLobbyAsync();
@@ -56,8 +56,6 @@ public class LobbyManager : NetworkBehaviour
             await UnityServices.InitializeAsync(initializationOptions);
             
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
-            
-            _fadePanel.SetActive(!playMultiplayer);
 
             if (!playMultiplayer)
             {

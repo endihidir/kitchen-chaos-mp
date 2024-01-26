@@ -18,7 +18,9 @@ public class GameEvents
 
     public static Action OnTryingToJoinGame, OnFailedToJoinGame;
 
-    public static Action OnPlayerReadyChanged, OnPlayerDataNetworkListChanged;
+    public static Action OnPlayerReadyChanged, OnPlayerDataNetworkListChanged, OnPlayerReadyToPlay;
+
+    public static Action<bool> OnEnableLobbyFadePanel;
 
     public static Action<List<Lobby>> OnLobbyListChanged;
 

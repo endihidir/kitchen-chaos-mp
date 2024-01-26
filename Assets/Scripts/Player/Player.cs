@@ -77,9 +77,9 @@ public class Player : NetworkBehaviour, IKitchenObjectParent
         _footStepTimer = _footStepTime;
         _isGamePlaying = GameManager.Instance.CurrentGameplayState == GamePlayState.GamePlay;
 
-        var lobbyManager = PlayerConnectionManager.Instance;
-        var playerData = lobbyManager.GetPlayerDataFromClientId(OwnerClientId);
-        _playerVisual.SetPlayerColor(lobbyManager.GetPlayerColor(playerData.colorId));
+        var playerConnectionManager = PlayerConnectionManager.Instance;
+        var playerData = playerConnectionManager.GetPlayerDataFromClientId(OwnerClientId);
+        _playerVisual.SetPlayerColor(playerConnectionManager.GetPlayerColor(playerData.colorId));
         
         SetSpawnPos();
     }
